@@ -1,0 +1,42 @@
+name: cabosat
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider:
+  http:
+  intl:
+  path_provider: ^2.1.5
+  permission_handler: ^11.3.1
+  open_file:
+  font_awesome_flutter:
+  firebase_messaging: ^15.1.5
+  firebase_core:
+  flutter_local_notifications:
+  url_launcher:
+  shared_preferences:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+  fonts:
+    - family: OktaNeue
+      fonts:
+        - asset: assets/fonts/OktaNeue-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/OktaNeue-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/OktaNeue-Black.ttf
+          weight: 900
