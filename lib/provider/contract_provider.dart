@@ -1,7 +1,7 @@
 import 'package:cabosat/models/contract_model.dart';
 import 'package:cabosat/models/user_model.dart';
 import 'package:cabosat/services/contract_service.dart';
-import 'package:cabosat/services/local_storage_service.dart';
+import 'package:cabosat/services/secure_storage_service.dart';
 import 'package:cabosat/services/user_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -10,10 +10,13 @@ class ContractProvider extends ChangeNotifier {
   bool _isLoading = true;
   ContractModel? _currentContract;
   List<ContractModel> _contracts = [];
+  String? _topic;
 
   bool get isLoading => _isLoading;
   List<ContractModel> get contracts => _contracts;
   ContractModel? get currentContract => _currentContract;
+
+  String? get topic => _topic;
 
   Future<void> loadContracts() async {
     try {
@@ -21,7 +24,7 @@ class ContractProvider extends ChangeNotifier {
       notifyListeners();
 
       UserModel? user =
-          await UserService(localStorageService: LocalStorageService())
+          await UserService(localStorageService: SecureStorageService())
               .getUser();
 
       if (user == null) {
@@ -52,26 +55,32 @@ class ContractProvider extends ChangeNotifier {
         String? city = _currentContract?.enderecoInstalacao?.cidade;
 
         if (city != null) {
-          String cityNormalized = city
-              .toLowerCase()
-              .replaceAll(' ', '_')
-              .replaceAll('á', 'a')
-              .replaceAll('é', 'e')
-              .replaceAll('í', 'i')
-              .replaceAll('ó', 'o')
-              .replaceAll('ú', 'u')
-              .replaceAll('ã', 'a')
-              .replaceAll('õ', 'o')
-              .replaceAll('â', 'a')
-              .replaceAll('ê', 'e')
-              .replaceAll('î', 'i')
-              .replaceAll('ô', 'o')
-              .replaceAll('û', 'u')
-              .replaceAll('ç', 'c');
+          _topic = _getTopic(city);
 
-          await FirebaseMessaging.instance.subscribeToTopic(cityNormalized);
+          await FirebaseMessaging.instance.subscribeToTopic(_topic!);
+
+          notifyListeners();
         }
       }
     } finally {}
+  }
+
+  _getTopic(String city) {
+    return city
+        .toLowerCase()
+        .replaceAll(' ', '_')
+        .replaceAll('á', 'a')
+        .replaceAll('é', 'e')
+        .replaceAll('í', 'i')
+        .replaceAll('ó', 'o')
+        .replaceAll('ú', 'u')
+        .replaceAll('ã', 'a')
+        .replaceAll('õ', 'o')
+        .replaceAll('â', 'a')
+        .replaceAll('ê', 'e')
+        .replaceAll('î', 'i')
+        .replaceAll('ô', 'o')
+        .replaceAll('û', 'u')
+        .replaceAll('ç', 'c');
   }
 }

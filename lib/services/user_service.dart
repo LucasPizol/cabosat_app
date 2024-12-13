@@ -1,33 +1,27 @@
 import 'package:cabosat/models/user_model.dart';
-import 'package:cabosat/services/local_storage_service.dart';
-import 'dart:convert';
+import 'package:cabosat/services/implementations/local_storage.dart';
 
 class UserService {
-  final LocalStorageService localStorageService;
+  final LocalStorage localStorageService;
 
   UserService({
     required this.localStorageService,
   });
 
   Future<void> saveUser(UserModel user) async {
-    String encodedUser = json.encode({
-      'cpfcnpj': user.cpfcnpj,
-      'senha': user.senha,
-    });
-
-    localStorageService.add('user', encodedUser);
+    await localStorageService.add('cpfcnpj', user.cpfcnpj);
+    await localStorageService.add('senha', user.senha);
   }
 
   Future<UserModel?> getUser() async {
-    var user = await localStorageService.get("user");
+    String? cpfcnpj = await localStorageService.get("cpfcnpj");
+    String? senha = await localStorageService.get("senha");
 
-    if (user == null) return null;
-    user = json.decode(user);
+    if (cpfcnpj == null || senha == null) {
+      return null;
+    }
 
-    return UserModel(
-      cpfcnpj: user['cpfcnpj']!,
-      senha: user['senha']!,
-    );
+    return UserModel(cpfcnpj: cpfcnpj, senha: senha);
   }
 
   Future<void> removeUser() async {

@@ -8,7 +8,6 @@ import 'package:cabosat/provider/contract_provider.dart';
 import 'package:cabosat/provider/home_navigation_provider.dart';
 import 'package:cabosat/provider/invoices_provider.dart';
 import 'package:cabosat/provider/notification_provider.dart';
-import 'package:cabosat/services/local_storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -98,11 +97,22 @@ class _BottomNavigationState extends State<BottomNavigation>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       Provider.of<InvoiceModelProvider>(context, listen: false).loadInvoices();
-      Provider.of<ContractProvider>(context, listen: false).loadContracts();
-      Provider.of<NotificationProvider>(context, listen: false)
-          .loadNotifications();
+      await Provider.of<ContractProvider>(context, listen: false)
+          .loadContracts();
+
+      String? topic =
+          Provider.of<ContractProvider>(context, listen: false).topic;
+
+      if (topic == null) {
+        await Provider.of<NotificationProvider>(context, listen: false)
+            .loadLocalNotifications();
+        return;
+      }
+
+      await Provider.of<NotificationProvider>(context, listen: false)
+          .loadNotifications(topic);
     });
 
     WidgetsBinding.instance.addObserver(this);
@@ -117,13 +127,8 @@ class _BottomNavigationState extends State<BottomNavigation>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
-      await LocalStorageService().reload();
-
-      Future.delayed(const Duration(milliseconds: 200), () {
-        // ignore: use_build_context_synchronously
-        Provider.of<NotificationProvider>(context, listen: false)
-            .loadNotifications();
-      });
+      Provider.of<NotificationProvider>(context, listen: false)
+          .loadLocalNotifications();
     }
   }
 }

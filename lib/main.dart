@@ -1,11 +1,10 @@
 import 'package:cabosat/firebase_options.dart';
-import 'package:cabosat/features/bottom_navigation.dart';
-import 'package:cabosat/features/login/screens/login_screen.dart';
 import 'package:cabosat/features/notification/screens/notification_screen.dart';
 import 'package:cabosat/provider/auth_provider.dart';
 import 'package:cabosat/provider/contract_provider.dart';
 import 'package:cabosat/provider/invoices_provider.dart';
 import 'package:cabosat/provider/notification_provider.dart';
+import 'package:cabosat/router.dart';
 import 'package:cabosat/services/notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -39,20 +38,12 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(builder: (context, AuthModel auth, child) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        auth.getCurrentUser();
-      });
-
-      return MaterialApp(
-        theme: ThemeData(fontFamily: 'OktaNeue'),
-        home: auth.isAuthenticated
-            ? const BottomNavigation()
-            : const LoginScreen(),
-        routes: {
-          '/notifications': (context) => const NotificationScreen(),
-        },
-      );
-    });
+    return MaterialApp(
+      theme: ThemeData(fontFamily: 'OktaNeue'),
+      home: const RouterWidget(),
+      routes: {
+        '/notifications': (context) => const NotificationScreen(),
+      },
+    );
   }
 }

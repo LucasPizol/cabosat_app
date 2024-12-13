@@ -57,6 +57,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '289815495329',
     projectId: 'food-app-19140',
     storageBucket: 'food-app-19140.firebasestorage.app',
-    iosBundleId: 'com.example.cabosat',
+    iosBundleId: 'com.cabosat.app',
   );
 }

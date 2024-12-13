@@ -1,6 +1,7 @@
 import 'package:cabosat/models/user_model.dart';
 import 'package:cabosat/services/auth_service.dart';
-import 'package:cabosat/services/local_storage_service.dart';
+import 'package:cabosat/services/secure_storage_service.dart';
+import 'package:cabosat/services/sqflite_service.dart';
 import 'package:cabosat/services/user_service.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,7 @@ class AuthModel extends ChangeNotifier {
 
   UserService _userService() {
     return UserService(
-      localStorageService: LocalStorageService(),
+      localStorageService: SecureStorageService(),
     );
   }
 
@@ -34,6 +35,7 @@ class AuthModel extends ChangeNotifier {
     if (user != null) {
       _auth = UserModel(cpfcnpj: user.cpfcnpj, senha: user.senha);
       _isAuthenticated = true;
+      notifyListeners();
     }
   }
 
@@ -107,6 +109,5 @@ class AuthModel extends ChangeNotifier {
 
   void getCurrentUser() {
     _getUser();
-    notifyListeners();
   }
 }

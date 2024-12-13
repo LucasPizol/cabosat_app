@@ -1,7 +1,7 @@
 import 'package:cabosat/models/invoice_model.dart';
 import 'package:cabosat/models/user_model.dart';
 import 'package:cabosat/services/invoice_service.dart';
-import 'package:cabosat/services/local_storage_service.dart';
+import 'package:cabosat/services/secure_storage_service.dart';
 import 'package:cabosat/services/user_service.dart';
 import 'package:flutter/material.dart';
 
@@ -22,7 +22,7 @@ class InvoiceModelProvider extends ChangeNotifier {
       notifyListeners();
 
       UserModel? user =
-          await UserService(localStorageService: LocalStorageService())
+          await UserService(localStorageService: SecureStorageService())
               .getUser();
 
       if (user == null) {

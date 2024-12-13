@@ -4,6 +4,7 @@ class NotificationModel {
   final DateTime recievedAt;
   final String id;
   bool isRead;
+  bool isDeleted;
 
   NotificationModel({
     required this.title,
@@ -11,6 +12,7 @@ class NotificationModel {
     required this.recievedAt,
     required this.id,
     required this.isRead,
+    required this.isDeleted,
   });
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
@@ -21,7 +23,8 @@ class NotificationModel {
           ? DateTime.parse(json['recievedAt'])
           : DateTime.now(),
       id: json['id'],
-      isRead: json['isRead'] ?? false,
+      isRead: json['isRead'] == 1,
+      isDeleted: json['isDeleted'] == 1,
     );
   }
 
@@ -31,7 +34,8 @@ class NotificationModel {
       'body': body,
       'recievedAt': recievedAt.toIso8601String(),
       'id': id,
-      'isRead': isRead,
+      'isRead': isRead ? 1 : 0,
+      'isDeleted': isDeleted ? 1 : 0,
     };
   }
 }

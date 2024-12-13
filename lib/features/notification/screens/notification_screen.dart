@@ -73,7 +73,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       "${thisNotification.recievedAt.day.toString().padLeft(2, '0')}/${thisNotification.recievedAt.month.toString().padLeft(2, '0')}/${thisNotification.recievedAt.year}",
                       style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: const Color.fromARGB(255, 84, 20, 143)),
+                          color: Color.fromARGB(255, 84, 20, 143)),
                     ),
                   ),
                   NotificationWidget(

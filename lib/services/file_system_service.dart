@@ -1,44 +1,38 @@
 import 'dart:io';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 
 class FileSystemService {
   Future<void> saveFile(String fileURL, String? fileName) async {
     try {
-      var file = File('');
-
       fileName = fileName ?? 'Recibo.pdf';
 
-      // Platform.isIOS comes from dart:io
-      if (Platform.isIOS) {
-        final dir = await getApplicationDocumentsDirectory();
-        file = File('${dir.path}/$fileName.pdf');
-      }
+      final response = await http.get(Uri.parse(fileURL));
 
-      if (Platform.isAndroid) {
-        var status = await Permission.storage.status;
-        if (status != PermissionStatus.granted) {
-          status = await Permission.storage.request();
-        }
-        if (status.isGranted) {
-          const downloadsFolderPath = '/storage/emulated/0/Download/';
-          Directory dir = Directory(downloadsFolderPath);
-          file = File('${dir.path}/$fileName.pdf');
-        }
-      }
+      String? directoryPath = await _getDownloadDirectory();
 
-      if (file.existsSync()) {
-        await OpenFile.open(file.path);
-        return;
-      }
+      if (directoryPath == null) return;
 
-      final byteData = await http.get(Uri.parse(fileURL));
-      final bytes = byteData.bodyBytes;
+      final filePath = "$directoryPath/$fileName.pdf";
+      final file = File(filePath);
 
-      await file.writeAsBytes(bytes);
-      await OpenFile.open(file.path);
+      await file.writeAsBytes(response.bodyBytes);
+      await OpenFile.open(filePath);
     } finally {}
+  }
+
+  Future<String?> _getDownloadDirectory() async {
+    Directory? directory;
+
+    if (Platform.isIOS) {
+      directory = await getApplicationDocumentsDirectory();
+    } else {
+      directory = Directory('/storage/emulated/0/Download');
+      if (!await directory.exists())
+        directory = await getExternalStorageDirectory();
+    }
+
+    return directory?.path;
   }
 }

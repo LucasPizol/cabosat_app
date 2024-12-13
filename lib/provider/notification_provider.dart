@@ -1,8 +1,6 @@
-import 'dart:convert';
-
 import 'package:cabosat/models/notification_model.dart';
-import 'package:cabosat/services/local_storage_service.dart';
-import 'package:cabosat/services/notification_service.dart';
+import 'package:cabosat/services/firestore_service.dart';
+import 'package:cabosat/services/sqflite_service.dart';
 import 'package:flutter/material.dart';
 
 class NotificationProvider extends ChangeNotifier {
@@ -16,12 +14,12 @@ class NotificationProvider extends ChangeNotifier {
     try {
       notification.isRead = true;
 
-      List<dynamic> notifications =
-          _notifications.map((notification) => notification.toJson()).toList();
+      SqfliteService database = SqfliteService();
 
-      await LocalStorageService()
-          .add('notifications', json.encode(notifications));
+      await database.updateData("notification", notification.toJson());
 
+      notifyListeners();
+    } catch (e) {
       notifyListeners();
     } finally {
       _isLoading = false;
@@ -42,26 +40,83 @@ class NotificationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> loadNotifications() async {
+  void setNotifications(List<Map<String, dynamic>> notifications) {
+    _notifications = List<NotificationModel>.from(notifications
+        .where((notification) => (notification['isDeleted'] ?? 0) == 0)
+        .map((json) => NotificationModel.fromJson({
+              'id': json['id'],
+              'title': json['title'],
+              'body': json['body'],
+              'recievedAt': DateTime.now().toIso8601String(),
+              'isRead': json['isRead'] ?? 0,
+              'isDeleted': json['isDeleted'] ?? 0
+            })))
+      ..sort((a, b) => b.recievedAt.compareTo(a.recievedAt));
+
+    notifyListeners();
+  }
+
+  Future<void> loadNotifications(String topic) async {
     try {
       _isLoading = true;
       notifyListeners();
 
-      String? getNotifications =
-          await LocalStorageService().get('notifications');
+      SqfliteService sqfliteService = SqfliteService();
 
-      if (getNotifications == null) {
-        _isLoading = false;
-        notifyListeners();
+      List<Map<String, dynamic>> localNotifications =
+          await sqfliteService.getData("notification");
 
-        return;
+      setNotifications(localNotifications);
+      notifyListeners();
+
+      FirestoreService database = FirestoreService();
+
+      List<Map<String, dynamic>> notifications =
+          await database.getNotifications(topic);
+
+      List<dynamic> localIds = localNotifications.map((e) => e['id']).toList();
+
+      List<Map<String, dynamic>> newNotifications = localNotifications.toList();
+
+      for (Map<String, dynamic> notification in notifications) {
+        if (localIds.contains(notification['id'])) {
+          continue;
+        }
+
+        Map<String, dynamic> json = {
+          'id': notification['id'],
+          'title': notification['title'],
+          'body': notification['body'],
+          'recievedAt': DateTime.now().toIso8601String(),
+          'isRead': 0,
+          'isDeleted': 0
+        };
+
+        await sqfliteService.insertData("notification", json);
+
+        newNotifications.add(json);
       }
 
-      List<dynamic> decodedNotifications = json.decode(getNotifications);
+      setNotifications(localNotifications);
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
-      _notifications = List<NotificationModel>.from(decodedNotifications.map(
-          (json) => NotificationModel.fromJson(json as Map<String, dynamic>)))
-        ..sort((a, b) => b.recievedAt.compareTo(a.recievedAt));
+  Future<void> loadLocalNotifications() async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      SqfliteService database = SqfliteService();
+
+      List<Map<String, dynamic>> notifications =
+          await database.getData("notification");
+
+      setNotifications(notifications);
 
       _isLoading = false;
       notifyListeners();
@@ -73,7 +128,26 @@ class NotificationProvider extends ChangeNotifier {
 
   Future<void> removeNotification(String id) async {
     try {
-      await NotificationService.instance.removeNotification(id);
+      SqfliteService database = SqfliteService();
+
+      Map<String, dynamic> notification =
+          (await database.getData("notification"))
+              .firstWhere((notification) => notification['id'] == id);
+
+      if (notification.isEmpty) {
+        return;
+      }
+
+      await database.updateData("notification", {
+        'id': notification['id'],
+        'title': notification['title'],
+        'body': notification['body'],
+        'recievedAt': notification['recievedAt'],
+        'isRead': 0,
+        'isDeleted': 1
+      });
+
+      loadLocalNotifications();
     } catch (e) {
       _isLoading = false;
       notifyListeners();

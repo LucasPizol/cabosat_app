@@ -1,4 +1,4 @@
-package com.example.cabosat
+package com.cabosat.app
 
 import io.flutter.embedding.android.FlutterActivity
 

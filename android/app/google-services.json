@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "289815495329",
+    "project_id": "food-app-19140",
+    "storage_bucket": "food-app-19140.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:289815495329:android:5d545fd9ed6401bc2726e0",
+        "android_client_info": {
+          "package_name": "com.cabosat.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtk8SUR4Q0jqIB_bmbwMrzgi2bCOxqVjI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:289815495329:android:1c5c6ef60d8afa032726e0",
+        "android_client_info": {
+          "package_name": "com.lucas.pizol.cabosat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtk8SUR4Q0jqIB_bmbwMrzgi2bCOxqVjI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:289815495329:android:dc224174e9d834d52726e0",
+        "android_client_info": {
+          "package_name": "com.pizol.foodapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtk8SUR4Q0jqIB_bmbwMrzgi2bCOxqVjI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
