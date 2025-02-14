@@ -46,7 +46,40 @@ class InvoiceModel {
     required this.id,
   });
 
+  toJson() {
+    return {
+      'vencimento_atualizado': ptBrToEn(vencimentoAtualizado),
+      'status': status.toString().split('.').last,
+      'data_pagamento': ptBrToEn(dataPagamento),
+      'idtransacao': idTransacao,
+      'codigopix': codigoPix,
+      'pagarcartaocheckout': pagarCartaoCheckout,
+      'link_completo': linkCompleto,
+      'numero_documento': numeroDocumento,
+      'recibo': recibo,
+      'gerapix': geraPix,
+      'statusid': statusId,
+      'vencimento': ptBrToEn(vencimento),
+      'pagarcartaodDebito': pagarCartaoDebito,
+      'valorcorrigido': valorCorrigido,
+      'valor': valor,
+      'link': link,
+      'linhadigitavel': linhaDigitavel,
+      'pagarcartao': pagarCartao,
+      'id': id,
+    };
+  }
+
+  ptBrToEn(String? date) {
+    if (date == null) return '';
+
+    List<String> splitted = date.split('/');
+    return "${splitted[2]}-${splitted[1]}-${splitted[0]}";
+  }
+
   factory InvoiceModel.fromJson(Map<String, dynamic> json) {
+    DateFormat formatter = DateFormat('dd/MM/yyyy', 'pt_BR');
+
     bool isExpired = DateTime.now()
             .add(
               const Duration(days: 1),
@@ -56,8 +89,6 @@ class InvoiceModel {
 
     InvoiceStatus status =
         json['status'] == 'Pago' ? InvoiceStatus.Pago : InvoiceStatus.Gerado;
-
-    DateFormat formatter = DateFormat('dd/MM/yyyy', 'pt_BR');
 
     String vencimento = json['vencimento'] != null
         ? formatter.format(DateTime.parse(json["vencimento"]))

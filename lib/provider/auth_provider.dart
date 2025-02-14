@@ -1,8 +1,7 @@
 import 'package:cabosat/models/user_model.dart';
-import 'package:cabosat/services/auth_service.dart';
-import 'package:cabosat/services/secure_storage_service.dart';
-import 'package:cabosat/services/sqflite_service.dart';
-import 'package:cabosat/services/user_service.dart';
+import 'package:cabosat/services/data/auth_service.dart';
+import 'package:cabosat/services/storage/secure_storage_service.dart';
+import 'package:cabosat/services/data/user_service.dart';
 import 'package:flutter/material.dart';
 
 class AuthModel extends ChangeNotifier {
@@ -14,9 +13,7 @@ class AuthModel extends ChangeNotifier {
   UserModel? get auth => _auth;
 
   UserService _userService() {
-    return UserService(
-      localStorageService: SecureStorageService(),
-    );
+    return UserService();
   }
 
   void _setUser(UserModel user) async {
@@ -25,18 +22,9 @@ class AuthModel extends ChangeNotifier {
   }
 
   void _removeUser() {
-    _userService().removeUser();
     _auth = null;
-  }
-
-  void _getUser() async {
-    UserModel? user = await _userService().getUser();
-
-    if (user != null) {
-      _auth = UserModel(cpfcnpj: user.cpfcnpj, senha: user.senha);
-      _isAuthenticated = true;
-      notifyListeners();
-    }
+    _isAuthenticated = false;
+    _userService().removeUser();
   }
 
   void _showDialog(BuildContext context) {
@@ -49,7 +37,7 @@ class AuthModel extends ChangeNotifier {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Fecha o diálogo
+                Navigator.of(context).pop();
               },
               child: const Text('Fechar'),
             ),
@@ -107,7 +95,21 @@ class AuthModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void getCurrentUser() {
-    _getUser();
+  Future<bool> getCurrentUser() async {
+    try {
+      UserModel? user = await _userService().getUser();
+
+      if (user != null) {
+        _auth = UserModel(cpfcnpj: user.cpfcnpj, senha: user.senha);
+        _isAuthenticated = true;
+        return true;
+      }
+
+      _removeUser();
+      return false;
+    } catch (e) {
+      _removeUser();
+      return false;
+    }
   }
 }

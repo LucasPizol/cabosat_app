@@ -24,7 +24,7 @@ class InvoiceCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
             child: Text(
-              "Fatura do dia ${invoice.vencimento}",
+              "Fatura do dia ${invoice.vencimentoAtualizado}",
               style: const TextStyle(
                   color: Colors.white, fontWeight: FontWeight.bold),
             )),

@@ -51,7 +51,7 @@ class ExpiredInvoiceAlert extends StatelessWidget {
                             fontSize: 20),
                       ),
                       Text(
-                          "Fatura vencida em ${expiredInvoices.first.vencimento}",
+                          "Fatura vencida em ${expiredInvoices.first.vencimentoAtualizado}",
                           style: const TextStyle(
                               fontWeight: FontWeight.w900,
                               color: Colors.white,

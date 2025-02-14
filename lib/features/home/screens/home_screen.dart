@@ -7,11 +7,16 @@ import 'package:cabosat/provider/invoices_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,
   });
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   Widget getInvoiceContent(InvoiceModel? lastInvoice, bool isLoading) {
     if (isLoading) {
       return const Center(

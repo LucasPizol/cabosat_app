@@ -21,7 +21,7 @@ class InvoiceWidget extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            subtitle: Text("Vencimento: ${invoice.vencimento}"),
+            subtitle: Text("Vencimento: ${invoice.vencimentoAtualizado}"),
             trailing: InvoiceTag(status: invoice.status!),
           ),
           Padding(

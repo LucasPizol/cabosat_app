@@ -4,8 +4,16 @@ import 'package:cabosat/widgets/gradient_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class PlanCard extends StatelessWidget {
+class PlanCard extends StatefulWidget {
   const PlanCard({super.key});
+
+  @override
+  State<PlanCard> createState() => _PlanCardState();
+}
+
+class _PlanCardState extends State<PlanCard> {
+  bool isLoading = true;
+  bool isConnected = false;
 
   @override
   Widget build(BuildContext context) {
@@ -13,6 +21,12 @@ class PlanCard extends StatelessWidget {
       if (contract.isLoading) {
         return const Center(
           child: CircularProgressIndicator(),
+        );
+      }
+
+      if (contract.currentContract == null) {
+        return const Center(
+          child: Text("Nenhum contrato encontrado"),
         );
       }
 

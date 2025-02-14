@@ -2,12 +2,11 @@ import 'package:cabosat/features/contract/screens/contract_screen.dart';
 import 'package:cabosat/features/home/screens/home_screen.dart';
 import 'package:cabosat/features/home/screens/invoices_screen.dart';
 import 'package:cabosat/features/home/widgets/home_scaffold.dart';
-import 'package:cabosat/features/home/widgets/invoice_card.dart';
-import 'package:cabosat/models/invoice_model.dart';
 import 'package:cabosat/provider/contract_provider.dart';
 import 'package:cabosat/provider/home_navigation_provider.dart';
 import 'package:cabosat/provider/invoices_provider.dart';
 import 'package:cabosat/provider/notification_provider.dart';
+import 'package:cabosat/services/connectivity_service.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +22,9 @@ class BottomNavigation extends StatefulWidget {
 
 class _BottomNavigationState extends State<BottomNavigation>
     with WidgetsBindingObserver {
+  bool isLoading = true;
+  bool isConnected = false;
+
   List<Map> screens = [
     {
       "screen": const HomeScreen(),
@@ -41,22 +43,28 @@ class _BottomNavigationState extends State<BottomNavigation>
     },
   ];
 
-  Widget getInvoiceContent(InvoiceModel? lastInvoice, bool isLoading) {
-    if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+  Future<void> checkConnectivity() async {
+    try {
+      isConnected = await ConnectivityService().isConnected();
+
+      if (!mounted) return;
+
+      setState(() {});
+
+      if (!isConnected) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Sem conexão com a internet"),
+          ),
+        );
+      }
+
+      isLoading = false;
+      setState(() {});
+    } catch (e) {
+      isLoading = false;
+      setState(() {});
     }
-
-    bool isEmpty = lastInvoice == null;
-
-    return isEmpty
-        ? const Center(
-            child: Text("Nenhuma fatura encontrada"),
-          )
-        : InvoiceCard(
-            invoice: lastInvoice,
-          );
   }
 
   @override
@@ -98,21 +106,25 @@ class _BottomNavigationState extends State<BottomNavigation>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      checkConnectivity();
+
       Provider.of<InvoiceModelProvider>(context, listen: false).loadInvoices();
       await Provider.of<ContractProvider>(context, listen: false)
           .loadContracts();
 
-      String? topic =
-          Provider.of<ContractProvider>(context, listen: false).topic;
+      if (mounted) {
+        String? topic =
+            Provider.of<ContractProvider>(context, listen: false).topic;
 
-      if (topic == null) {
+        if (topic == null) {
+          await Provider.of<NotificationProvider>(context, listen: false)
+              .loadLocalNotifications();
+          return;
+        }
+
         await Provider.of<NotificationProvider>(context, listen: false)
-            .loadLocalNotifications();
-        return;
+            .loadNotifications(topic);
       }
-
-      await Provider.of<NotificationProvider>(context, listen: false)
-          .loadNotifications(topic);
     });
 
     WidgetsBinding.instance.addObserver(this);

@@ -58,8 +58,6 @@ class HomeScaffold extends StatelessWidget {
               Consumer(builder: (context, ContractProvider contract, child) {
                 return IconButton(
                   onPressed: () async {
-                    Navigator.pushNamed(context, '/');
-
                     String? city =
                         contract.currentContract?.enderecoInstalacao?.cidade;
 

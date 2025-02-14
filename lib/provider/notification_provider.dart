@@ -1,6 +1,6 @@
 import 'package:cabosat/models/notification_model.dart';
-import 'package:cabosat/services/firestore_service.dart';
-import 'package:cabosat/services/sqflite_service.dart';
+import 'package:cabosat/services/notifications/firestore_service.dart';
+import 'package:cabosat/services/storage/sqflite_service.dart';
 import 'package:flutter/material.dart';
 
 class NotificationProvider extends ChangeNotifier {

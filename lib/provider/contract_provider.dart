@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:cabosat/models/contract_model.dart';
 import 'package:cabosat/models/user_model.dart';
-import 'package:cabosat/services/contract_service.dart';
-import 'package:cabosat/services/secure_storage_service.dart';
-import 'package:cabosat/services/user_service.dart';
+import 'package:cabosat/services/data/contract_service.dart';
+import 'package:cabosat/services/storage/secure_storage_service.dart';
+import 'package:cabosat/services/storage/sqflite_service.dart';
+import 'package:cabosat/services/data/user_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
@@ -23,9 +26,9 @@ class ContractProvider extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      UserModel? user =
-          await UserService(localStorageService: SecureStorageService())
-              .getUser();
+      ContractService contractService = ContractService();
+
+      UserModel? user = await UserService().getUser();
 
       if (user == null) {
         _isLoading = false;
@@ -36,20 +39,47 @@ class ContractProvider extends ChangeNotifier {
         return;
       }
 
-      _contracts =
-          await ContractService().loadContracts(user.cpfcnpj, user.senha);
-      notifyListeners();
+      SqfliteService sqfliteService = SqfliteService();
 
-      if (_contracts.isEmpty) {
+      List<Map<String, dynamic>> cachedContracts =
+          await sqfliteService.getData("contract");
+
+      if (cachedContracts.isNotEmpty) {
+        List<dynamic> parsedContract = json.decode(cachedContracts[0]['json']);
+
+        _contracts =
+            parsedContract.map((e) => ContractModel.fromJson(e)).toList();
+
+        _currentContract = _contracts.first;
+
         _isLoading = false;
         notifyListeners();
 
+        _contracts =
+            await contractService.loadContracts(user.cpfcnpj, user.senha);
+
+        await sqfliteService.updateData("contract", {
+          "json": json.encode(_contracts.map((e) => e.toJson()).toList()),
+          "id": '1'
+        });
+        notifyListeners();
+      } else {
+        _contracts =
+            await contractService.loadContracts(user.cpfcnpj, user.senha);
+
+        await sqfliteService.insertData("contract", {
+          "json": json.encode(_contracts.map((e) => e.toJson()).toList()),
+          "id": '1'
+        });
+
+        notifyListeners();
+      }
+
+      if (_contracts.isEmpty) {
         return;
       }
 
       _currentContract = _contracts.first;
-      _isLoading = false;
-      notifyListeners();
 
       if (_currentContract != null) {
         String? city = _currentContract?.enderecoInstalacao?.cidade;
@@ -62,7 +92,10 @@ class ContractProvider extends ChangeNotifier {
           notifyListeners();
         }
       }
-    } finally {}
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   _getTopic(String city) {

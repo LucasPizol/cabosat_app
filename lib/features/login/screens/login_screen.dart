@@ -82,8 +82,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 gradient: const LinearGradient(
                                   colors: <Color>[Colors.orange, Colors.red],
                                 ),
-                                onPressed: () {
-                                  auth.login(
+                                onPressed: () async {
+                                  await auth.login(
                                       cpfcnpj: cpfcnpjController.text,
                                       senha: senhaController.text,
                                       context: context);
@@ -100,7 +100,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             const DividerWithText(text: "ou"),
                             const SizedBox(height: 20),
                             RaisedGradientButton(
-                                isLoading: auth.isLoading,
                                 width: double.infinity,
                                 gradient: const LinearGradient(
                                   colors: <Color>[
