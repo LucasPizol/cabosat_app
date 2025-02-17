@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:cabosat/models/contract_model.dart';
 import 'package:cabosat/models/user_model.dart';
 import 'package:cabosat/services/data/contract_service.dart';
-import 'package:cabosat/services/storage/secure_storage_service.dart';
 import 'package:cabosat/services/storage/sqflite_service.dart';
 import 'package:cabosat/services/data/user_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';

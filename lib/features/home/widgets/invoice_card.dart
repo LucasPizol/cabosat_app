@@ -19,7 +19,7 @@ class InvoiceCard extends StatelessWidget {
       child: ListTile(
         title: Container(
             decoration: const BoxDecoration(
-              color: const Color.fromARGB(255, 84, 20, 143),
+              color:Color.fromARGB(255, 84, 20, 143),
             ),
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),

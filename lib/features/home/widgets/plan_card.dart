@@ -34,14 +34,11 @@ class _PlanCardState extends State<PlanCard> {
         padding: const EdgeInsets.all(20),
         width: double.infinity,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          gradient: const LinearGradient(
-            colors: [
-              Colors.orange,
-              Colors.red,
-            ],
-          ),
-        ),
+            borderRadius: BorderRadius.circular(10),
+            gradient: const LinearGradient(colors: [
+              Color.fromARGB(255, 84, 20, 143),
+              Color.fromARGB(255, 112, 53, 168)
+            ])),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -80,7 +77,8 @@ class _PlanCardState extends State<PlanCard> {
                 child: const Text(
                   "Mais informações",
                   style: TextStyle(
-                      color: Colors.orange, fontWeight: FontWeight.bold),
+                      color: Color.fromARGB(255, 84, 20, 143),
+                      fontWeight: FontWeight.bold),
                 ),
               );
             })
