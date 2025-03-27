@@ -3,6 +3,7 @@ import 'package:cabosat/services/file_system_service.dart';
 import 'package:cabosat/widgets/gradient_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class InvoiceButtons extends StatefulWidget {
   final InvoiceModel invoice;
@@ -53,28 +54,62 @@ class _InvoiceButtonsState extends State<InvoiceButtons> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        RaisedGradientButton(
-          onPressed: () async {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Baixando fatura..."),
-                duration: Duration(seconds: 2),
-              ),
-            );
+        Row(
+          children: [
+            RaisedGradientButton(
+              onPressed: () async {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Baixando fatura..."),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
 
-            await FileSystemService().saveFile(
-                widget.invoice.linkCompleto!, "Fatura__${widget.invoice.id}");
-          },
-          gradient: const LinearGradient(
-            colors: <Color>[Colors.orange, Colors.red],
-          ),
-          icon: Icon(Icons.print,
-              color: Colors.white, size: commonButtonProps["iconSize"]),
-          height: commonButtonProps["height"],
-          child: const Text("Imprimir",
-              style: TextStyle(
-                color: Colors.white,
-              )),
+                await FileSystemService().saveFile(widget.invoice.linkCompleto!,
+                    "Fatura__${widget.invoice.id}");
+              },
+              gradient: const LinearGradient(
+                colors: <Color>[Colors.orange, Colors.red],
+              ),
+              icon: Icon(Icons.print,
+                  color: Colors.white, size: commonButtonProps["iconSize"]),
+              height: commonButtonProps["height"],
+              child: const Text("Imprimir",
+                  style: TextStyle(
+                    color: Colors.white,
+                  )),
+            ),
+            widget.invoice.pagarCartaoCheckout != null
+                ? const SizedBox(width: 10)
+                : const SizedBox.shrink(),
+            widget.invoice.pagarCartaoCheckout != null
+                ? RaisedGradientButton(
+                    onPressed: () async {
+                      try {
+                        final Uri _url =
+                            Uri.parse(widget.invoice.pagarCartaoCheckout!);
+                        if (!await launchUrl(_url)) {
+                          throw Exception('Could not launch $_url');
+                        }
+                      } catch (e) {}
+                    },
+                    gradient: const LinearGradient(
+                      colors: <Color>[
+                        Color.fromARGB(255, 87, 226, 22),
+                        Color.fromARGB(255, 87, 226, 22)
+                      ],
+                    ),
+                    icon: Icon(Icons.credit_card,
+                        color: Colors.white,
+                        size: commonButtonProps["iconSize"]),
+                    height: commonButtonProps["height"],
+                    child: const Text("Checkout",
+                        style: TextStyle(
+                          color: Colors.white,
+                        )),
+                  )
+                : const SizedBox.shrink()
+          ],
         ),
         const SizedBox(height: 10),
         Row(

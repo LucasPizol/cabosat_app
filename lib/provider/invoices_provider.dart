@@ -43,7 +43,6 @@ class InvoiceModelProvider extends ChangeNotifier {
 
         _invoices = parsedInvoice.map((e) => InvoiceModel.fromJson(e)).toList();
         _filteredInvoices = _invoices;
-        _currentInvoice = _invoices.first;
 
         _isLoading = false;
         notifyListeners();
@@ -58,20 +57,23 @@ class InvoiceModelProvider extends ChangeNotifier {
           "id": '1'
         });
         notifyListeners();
-      } else {
-        _invoices =
-            await InvoiceService().loadInvoices(user.cpfcnpj, user.senha);
-        _filteredInvoices = _invoices;
 
-        await sqfliteService.insertData("invoice", {
-          "json": json.encode(_invoices.map((e) => e.toJson()).toList()),
-          "id": '1'
-        });
-
-        notifyListeners();
+        return;
       }
+      _invoices = await InvoiceService().loadInvoices(user.cpfcnpj, user.senha);
+      _filteredInvoices = _invoices;
+
+      await sqfliteService.insertData("invoice", {
+        "json": json.encode(_invoices.map((e) => e.toJson()).toList()),
+        "id": '1'
+      });
+
+      notifyListeners();
+    } catch (e) {
     } finally {
-      _currentInvoice = _invoices.first;
+      if (_invoices.isNotEmpty) {
+        _currentInvoice = _invoices.first;
+      }
       _isLoading = false;
       notifyListeners();
     }

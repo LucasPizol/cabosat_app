@@ -11,8 +11,9 @@ class InvoiceService {
         'senha': senha,
       });
 
-      List<InvoiceModel> invoices = List<InvoiceModel>.from(httpRequest["faturas"]
-          .map((json) => InvoiceModel.fromJson(json as Map<String, dynamic>)));
+      List<InvoiceModel> invoices = List<InvoiceModel>.from(
+          httpRequest["faturas"].map(
+              (json) => InvoiceModel.fromJson(json as Map<String, dynamic>)));
 
       invoices.sort((a, b) {
         List<String> splittedA = a.vencimentoAtualizado!.split('/');

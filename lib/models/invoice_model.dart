@@ -9,7 +9,7 @@ class InvoiceModel {
   String? dataPagamento;
   String? idTransacao;
   String? codigoPix;
-  bool? pagarCartaoCheckout;
+  String? pagarCartaoCheckout;
   String? linkCompleto;
   int? numeroDocumento;
   String? recibo;
